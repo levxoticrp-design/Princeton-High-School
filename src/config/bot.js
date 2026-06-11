@@ -544,6 +544,40 @@ export function getRandomColor() {
 
 export default botConfig;
 
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    PermissionFlagsBits
+} = require('discord.js');
 
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('infraction')
+        .setDescription('Issue an infraction to a member.')
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('User to issue the infraction to')
+                .setRequired(true))
+        .addStringOption(option =>
+            option.setName('reason')
+                .setDescription('Reason for the infraction')
+                .setRequired(true))
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
+    async execute(interaction) {
+        const user = interaction.options.getUser('user');
+        const reason = interaction.options.getString('reason');
 
+        const embed = new EmbedBuilder()
+            .setTitle('📋 Infraction Issued')
+            .setColor('Red')
+            .addFields(
+                { name: 'Member', value: `${user}`, inline: true },
+                { name: 'Issued By', value: `${interaction.user}`, inline: true },
+                { name: 'Reason', value: reason }
+            )
+            .setTimestamp();
+
+        await interaction.reply({ embeds: [embed] });
+    }
+};
